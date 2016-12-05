@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>UKVDL Prototype</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+    <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet"/>
+    <link href="css/styles.css" rel='stylesheet' />
+</head>
+<body>
+
+<div id='side-panel'>
+    <h1>UKVDL Prototype frame</h1>
+    <h2>Where do our clients submit from?</h2>
+    <p></p>
+    <div id="year">Year: <span>1995</span></div>
+    <p></p>
+    <h2><br>About the map:</h2>
+    <p>this is going to be a map</a></p>
+    <p>Created by Dr. Jackie Smith and James Mason</p>
+
+
+
+
+
+
+    <div id ='ui-data'>
+        <label> Choose Accessions, Total Animals or Species:</label>
+        <select id = "kyCounty">
+            <option value="ACC_" selected>Accessions</option>
+            <option value="EQ_" >Equine</option>
+            <option value="BOV_" >Bovine</option>
+            <option value="OV_" >Ovine</option>
+            <option value="CAP_" >Caprine</option>
+            <option value="AV_" >Avian</option>
+            <option value="POR_" >Porcine</option>
+            <option value="FEL_" >Feline</option>
+            <option value="CAN_" >Canine</option>
+            <option value="WIL_" >Wildlife</option>
+            <option value="MIS_" >Miscellaneous</option>
+            <option value="TOT_" >Total Animals</option>
+        </select>
+
+
+    </div>
+
+
+    </div>
+
+ <div id='map'></div>
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+   <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+   <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script>
+   <script src='https://npmcdn.com/simple-statistics@2.0.0/dist/simple-statistics.min.js'></script>
+   <script src='js/app.js'></script>
+</body>
+</html>
