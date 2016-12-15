@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset=utf-8 />
+    <title>UKVDL Submissions</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='http://d3js.org/d3.v3.js'></script>
+    <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+    <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script>
+    <script src='https://npmcdn.com/simple-statistics@2.0.0/dist/simple-statistics.min.js'></script>
+    
+    <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet'/>
+    <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet"/>
+    <style>
+        body {
+            margin:0;
+            padding:0;    
+            font-family: 'Scope One', serif;    
+        }
+
+
+        #side-panel {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 41%;
+            background-color:rgba(90, 90, 90, 0.50);
+            overflow-y: scroll;
+            box-shadow:  0 0 20px rgba(0,0,0,0.2);
+        }
+        
+        h1{
+            padding: 2%;
+            margin: 0;
+            background: blue;
+            color: whitesmoke;
+            font-weight: 200;
+            font-size: 1.5em;
+            text-align: center;
+            box-shadow:  0 0 15px rgba(0,0,0,0.2);
+        }
+        h2 {
+            padding: 0% 0% 0% 3%;
+            margin: 0% 0% 0% 0%;
+            color: whitesmoke;
+            font-weight: 500;
+            font-size: 1em;
+            text-align: left;
+        }
+
+        #side-panel p {
+            padding: 0px 15px 0 15px;
+            color: whitesmoke;
+            text-align: justify;
+            font-size: .8em;
+            clear: left;
+        }
+        #side-panel p:after {
+            content: '';
+            display: block;
+        }
+        
+        #map {
+            position:absolute;
+            top:0;
+            bottom:0;
+            right: 0;
+            width: 60%;
+        }
+
+ 
+/*
+        #filter{
+            position: absolute;
+            left: 0%;
+            bottom: 5%;
+            right: 4%;
+            left: 3%;
+            width: 100%;
+            color: #000;
+        }
+        .slider2 {
+            margin: 0% 0% 3% 0%;
+            width: 50%; 
+        }
+*/
+
+        #year{
+            position: absolute;
+            bottom: 59%;
+            left:70%;
+            color: whitesmoke;
+            font-weight: 200;
+            font-size: 1.5em;
+            text-align: right;
+            
+        }
+        #ui-data{
+            position: absolute;
+            bottom: 5%;
+            right: 4%;
+            left: 3%;
+            width: 94%;
+            color: #000;
+               
+        }
+        #ui-data > label {
+            color: yellow;
+        }
+        
+        #ui-data2>label {
+            color: blue;
+        }
+    
+        .slider {
+            margin: 3% 0% 3% 0%;
+            width: 55%; 
+        }
+        
+        
+        #chart-container { 
+            bottom: 0%;
+            height: 175px;
+            background-color: #d1d1d1;
+            background-color:rgba(90, 90, 90, 0);
+            //box-shadow:  0 0 15px rgba(0,0,0,0.2);
+            font-size: .6em;
+            color: #000;
+            
+        }
+
+        #info {
+            position: absolute;
+            left: 10px;
+            right: 1px;
+            bottom: 47%; 
+            height: 12%;
+            width: 95%;
+            font-size: 1em;
+            background-color: rgba(90, 90, 90, 0.10);
+            //box-shadow:  0 0 15px rgba(0,0,0,0.2);
+            
+        }
+        
+        #info p{
+            padding: 3px 0px 0px 10px;
+            margin: 3px 0px 1px 15px;
+            float: left;
+            color: yellow;
+            
+        }
+        
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: white;
+          shape-rendering: crispEdges;
+              
+        }
+
+        .x.axis path {
+          display: ;
+            font-size: .6em;
+        }
+
+        .line {
+          fill: none;
+          stroke: white;
+          stroke-width: 2;
+        } 
+        
+        .overlay {
+          fill: none;
+          pointer-events: all;
+        }
+
+        .focus circle {
+          fill: none;
+          stroke: steelblue;
+        }
+        
+         /*hyperlink management to keep track of whether link has been visited or not
+        
+      /* unvisited link */
+        a:link {
+            color: blue;
+        }
+
+        /* visited link */
+        a:visited {
+            color: yellow;
+        }
+
+        /* mouse over link */
+        a:hover {
+            color: blue;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div id='map'></div>
+    
+<div id='side-panel'>
+    <h1>UKVDL Submissons 1995-2015</h1>
+    <h2>Where do our clients submit from?</h2>
+    <h2><br>About this map:</h2>
+     <p>Compare UKVDL submissions by species from Kentucky Counties.  The second selector will allow you to compare another variable to the first selector you choose. Use the date slider to see changes over the years 1995 to 2015. The chart gives a overall trend for submissions by the county you mouse over and will give the county name and number of accessions submitted.  The larger the circles, the higher the number of submissions. All  data is sourced from the <a href="http://vdl.uky.edu/">University of Kentucky Veterinary Diagnostic Laboratory Epidemiology Division</a></p>
+    <p>Created by <a href="http://vdl.uky.edu/FacultyAndSectionHeads/DrJackieSmith.aspx">Dr. Jackie Smith</a> and <a href="http://vdl.uky.edu/FacultyAndSectionHeads/JamesMason.aspx"> James Mason</a></p>
+    
+
+    
+    <div id ='ui-data'>
+        <label>Select Accessions, Total Animals or Species Submitted: </label>
+        <select id = "selector"> 
+             <option value="ACC_" selected>Accessions Submitted</option>
+            <option value="BOV_" >Bovine</option>
+            <option value="EQ_" >Equine</option>
+            <option value="OV_" >Ovine</option>
+            <option value="CAP_" >Caprine</option>
+            <option value="AV_" >Avian</option>
+            <option value="POR_" >Porcine</option>
+            <option value="FEL_" >Feline</option>
+            <option value="CAN_" >Canine</option>
+            <option value="WIL_" >Wildlife</option>
+            <option value="MIS_" >Miscellaneous</option>
+            <option value="TOT_" >Total Animals</option>
+        </select>
+    <div id ='ui-data2'>    
+        <label> Select Accessions, Total Animals or Species for Comparison:</label>
+        <select id = "selector2"> 
+            <option value="ACC_" selected>Accessions Submitted</option>
+            <option value="BOV_" >Bovine</option>
+            <option value="EQ_" >Equine</option>
+            <option value="OV_" >Ovine</option>
+            <option value="CAP_" >Caprine</option>
+            <option value="AV_" >Avian</option>
+            <option value="POR_" >Porcine</option>
+            <option value="FEL_" >Feline</option>
+            <option value="CAN_" >Canine</option>
+            <option value="WIL_" >Wildlife</option>
+            <option value="MIS_" >Miscellaneous</option>
+            <option value="TOT_" >Total Animals</option>
+    </select></div>
+    
+        <input class="slider" type="range" min="1995" max="2015" value="1995" step="1" >
+        <div id="year">Year: <span>1995</span></div>
+        
+
+        <div id='chart-container'  style="width: 100%; height:170px">
+         <div id="info">
+        <p><span></span></p>
+        <p class='selectorData'>Accessions Submitted: <span></span></p>  
+
+        <svg id='chart' style="width: 100%; height:170px"></svg>
+      
+        
+
+    </div>
+
+    
+</div>  <!-- end side panel -->
+    
+    
+    
+
+
+
+<script>
+
+(function() {
+    
+    
+    L.mapbox.accessToken = 'pk.eyJ1IjoianNtaXQ4IiwiYSI6ImNpdXR6cmlzeDAyaTUydXBzY2pyeTQ1ajIifQ.OsqnhovcG7e5arkfsr2hyA';
+    
+   
+
+   var map = L.mapbox.map('map', 'mapbox.dark', {
+            center: [37.8, -85.8],
+            zoom: 7,
+            minZoom: 4,
+            maxZoom: 9, 
+        
+
+    });
+    
+
+    var countyCentroids = omnivore.csv('ukvdl_accessions.csv')
+        .on('ready',function(e) {
+            drawMap(e.target.toGeoJSON())
+        })
+        .on('error', function(e) {
+            console.log(e.error[0].message)
+        });
+
+
+    // global vars for chart      
+    var currentYear = 1995,
+        data,
+        selectorData = 'ACC_',
+        selectorData2 = 'ACC_';
+
+    var margin = {top: 20, right: 200, bottom: 35, left: 35},
+        width = 620 - margin.left - margin.right,
+        height = 175 - margin.top - margin.bottom;
+
+
+
+    var x = d3.scale.linear()
+        .domain([1995, 2015])
+        .range([0, width])
+
+        
+
+    var y = d3.scale.linear()
+        .domain([0, 16000])
+		.range([height, 0]);
+		
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(20)
+        .tickFormat(d3.format(""));
+        
+    
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left").ticks(5);
+        
+
+    var line = d3.svg.line()
+        .x(function(d) { return x(d.date); })
+        .y(function(d) { return y(d.close); });
+       
+
+    var svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .attr("transform", "rotate(-30)")
+    
+    
+
+
+      
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 405)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text("Submission TREND");
+    
+    // create reference to line for updating later in updateChart
+    var path = svg.append("path").attr('class', 'line');
+
+    function drawMap(animalNumber){
+        
+         data = L.geoJson(animalNumber, {
+            pointToLayer: function(feature, layer){
+                return L.circleMarker(layer, {
+                    color: '#e0e02a',
+                    opacity: 1,
+                    weight: .9,
+                    fillOpacity: 0,
+                  
+                });
+                
+            },
+                
+             onEachFeature(feature, layer) {
+
+                layer.on('mouseover', function() {
+                     var layerData = getChartData(feature);
+                     updateChart(layerData);
+
+                 });
+                 
+                 
+             }
+            
+         }).addTo(map);
+        
+                
+         data2 = L.geoJson(animalNumber, {
+                pointToLayer: function(feature, layer){
+                    return L.circleMarker(layer, {
+                        color: '#33a5ff',
+                        opacity: 1,
+                        weight: .9,
+                        fillOpacity: 0,
+        
+                    });
+                },
+             
+                onEachFeature(feature, layer) {
+
+                    layer.on('mouseover', function() {
+                     var layerData = getChartData(feature);
+                     updateChart(layerData);
+
+                });
+             
+                }
+             
+         }).addTo(map)
+        
+    
+            addUiListeners();
+            updateSymbols();
+    };
+  
+
+    
+             
+
+    function addUiListeners(){
+
+        // listen for changes to the temperal slider
+        $('.slider')
+            .on('input change', function() {
+                currentYear = $(this).val();
+                updateSymbols(currentYear);
+                $('#year span').html(currentYear);
+        });
+           
+        $('.slider2')
+            .on('input change', function() {
+                animalValue = $(this).val()
+                filter(animalValue)
+        });
+        
+
+
+        // listen for changes to the dropdown attribute selector
+        $('select[id="selector"]').change(function(){
+            selectorData = $(this).val();
+            updateSymbols(selectorData);
+
+        });
+        
+        $('select[id="selector2"]').change(function(){
+            selectorData2 = $(this).val();
+            updateSymbols(selectorData2);
+
+            
+        });
+        
+        
+        
+    };        
+
+
+    function updateSymbols() {
+
+
+        var allRadii = [];
+         
+        data.eachLayer(function(layer) {
+            var props = layer.feature.properties;
+            var percent = Number(props[selectorData + currentYear]/props['TOT_'+currentYear])*100;
+            var individualAnimals = Number(props[selectorData + currentYear]);
+            var radius = calcRadius(individualAnimals);
+            layer.setRadius(radius);
+            allRadii.push(radius);
+            
+
+        }).bringToFront();
+        
+        data2.eachLayer(function(layer) {
+            var props = layer.feature.properties;
+            var percent = Number(props[selectorData + currentYear]/props['TOT_'+currentYear])*100;
+            var individualAnimals = Number(props[selectorData2 + currentYear]);
+            var radius = calcRadius(individualAnimals);
+            layer.setRadius(radius);
+            allRadii.push(radius);
+
+
+        });
+
+
+    }
+
+   function calcRadius(val) {
+
+        var radius = Math.sqrt(val/Math.PI);
+        return radius * .6;
+
+    }
+
+
+    function getChartData(feature) {
+
+            var props = feature.properties;
+          
+            var chartData = [];
+
+            for(var i = 1995; i <= 2015; i++) {
+                chartData.push([i, Number(props["ACC_" + i])]);
+            }       
+        
+        infoWindow();
+function infoWindow() {
+            var info = $('#info');
+            
+            data.on('mouseover', function(e){
+                
+
+                info.show()
+                
+                var props = e.layer.feature.properties;
+                var displayCounty = props.county;
+                var accessions = Number(props[selectorData + currentYear]);
+                $('#info span').text(displayCounty+' '+currentYear);
+                $('.selectorData span').text((accessions*1).toLocaleString());
+                $('.percentTotal span').text((accessions/props["TOT_" + currentYear]*100).toLocaleString());
+                
+                
+                e.layer.setStyle({ fillOpacity: .6 });
+                       
+                
+            });
+                    
+            data.on('mouseout', function(e){
+               
+                e.layer.setStyle({ fillOpacity: 0});
+                
+            });
+               
+        }
+            function updateInfo(){
+                
+
+            }
+        
+       function calcRadius(val) {
+            
+            var radius = Math.sqrt(val/Math.PI);
+            return radius * .6;
+            
+        }
+
+            var chartData = chartData.map(function(d) {
+                  return {
+                     date: d[0],
+                     close: d[1]
+                  };
+
+              });
+
+            return chartData;       
+
+    }
+
+    
+
+    function updateChart(chartData){  
+
+           x.domain(d3.extent(chartData, function(d) { return d.date; }));
+           y.domain(d3.extent(chartData, function(d) { return d.close; }));
+        
+
+           d3.select('.line')
+               .datum(chartData)
+               .attr("d", line);
+            
+          var focus = svg.append("g")
+              .attr("class", "focus")
+              .style("display", "none");
+
+          focus.append("text")
+              .attr("x", 1)
+              .attr("dy", ".35em");
+
+          svg.append("rect")
+              .attr("class", "overlay")
+              .attr("width", width)
+              .attr("height", height)
+              .on("mouseover", function() { focus.style("display", null); })
+              .on("mouseout", function() { focus.style("display", "none"); })
+
+    } 
+
+
+
+    
+})();
+
+</script>
+</body>
+</html>
+
